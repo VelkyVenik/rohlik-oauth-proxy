@@ -15,6 +15,8 @@ Rohlik MCP Proxy — a Bun-based HTTP server that proxies MCP (Model Context Pro
 
 - `bun run start` — start server
 - `bun run dev` — start with auto-reload
+- `bun run cli list` — list registered users
+- `bun run cli delete <id>` — delete a user by ID
 - `npx tsc --noEmit` — typecheck
 
 ## Architecture
@@ -27,6 +29,7 @@ All routing is in `src/index.ts`. Request handling is split by concern:
 - `oauth.ts` — OAuth 2.1 flow (client registration, authorize, token exchange)
 - `proxy.ts` — MCP forwarding (POST/GET/DELETE with SSE streaming support)
 - `auth.ts` — Bearer token resolution from Authorization header
+- `cli.ts` — CLI tool for listing/deleting user accounts
 - `store.ts` — SQLite schema, encryption/decryption, all DB operations
 - `security.ts` — rate limiting, validation, headers
 - `log.ts` — structured console logging

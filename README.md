@@ -44,6 +44,10 @@ bun run start
 
 # Development (auto-reload)
 bun run dev
+
+# Manage accounts
+bun run cli list              # List all registered users
+bun run cli delete <id>       # Delete a user by ID
 ```
 
 ## How it works
@@ -80,6 +84,7 @@ src/
 ├── store.ts          # SQLite DB, encryption, user/client/code storage
 ├── security.ts       # Rate limiting, input validation, security headers
 ├── log.ts            # Structured console logging
+├── cli.ts            # CLI tool for account management
 ├── landing.html      # Public landing page
 └── authorize.html    # OAuth sign-in form
 ```

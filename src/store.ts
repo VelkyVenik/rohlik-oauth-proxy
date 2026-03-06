@@ -151,6 +151,27 @@ export function deleteByEmailHash(emailHash: string): boolean {
   return result.changes > 0;
 }
 
+export function deleteById(id: number): boolean {
+  const result = db.run("DELETE FROM users WHERE id = ?", [id]);
+  return result.changes > 0;
+}
+
+export async function listUsers(): Promise<
+  { id: number; rohlikEmail: string; createdAt: string }[]
+> {
+  const rows = db
+    .query("SELECT id, rohlik_email_enc, created_at FROM users ORDER BY id")
+    .all() as { id: number; rohlik_email_enc: string; created_at: string }[];
+  const results = [];
+  for (const row of rows) {
+    results.push({
+      id: row.id,
+      rohlikEmail: await decrypt(row.rohlik_email_enc),
+      createdAt: row.created_at,
+    });
+  }
+  return results;
+}
 
 // --- OAuth ---
 
