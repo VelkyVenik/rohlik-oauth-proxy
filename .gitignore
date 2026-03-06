@@ -1,0 +1,5 @@
+node_modules/
+proxy.db
+proxy.db-wal
+proxy.db-shm
+.env

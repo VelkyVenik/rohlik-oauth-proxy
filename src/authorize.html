@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rohlik MCP - Sign In</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f5f5f5; }
+    .card { background: #fff; border-radius: 8px; padding: 2rem; width: 100%; max-width: 380px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    h1 { font-size: 1.3rem; margin-bottom: 0.3rem; }
+    .subtitle { color: #666; font-size: 0.85rem; margin-bottom: 1.5rem; }
+    label { display: block; font-size: 0.85rem; color: #555; margin-bottom: 0.25rem; }
+    input[type="email"], input[type="password"] { width: 100%; padding: 0.5rem 0.6rem; border: 1px solid #ccc; border-radius: 4px; font-size: 0.95rem; margin-bottom: 1rem; }
+    button { width: 100%; padding: 0.6rem; background: #2563eb; color: #fff; border: none; border-radius: 4px; font-size: 0.95rem; cursor: pointer; }
+    button:hover { background: #1d4ed8; }
+    button:disabled { background: #93c5fd; cursor: wait; }
+    .info { font-size: 0.75rem; color: #999; text-align: center; margin-top: 1rem; }
+    .info a { color: #2563eb; }
+    .msg { padding: 0.5rem; border-radius: 4px; margin-bottom: 1rem; font-size: 0.85rem; display: none; }
+    .msg.err { display: block; background: #fee2e2; color: #991b1b; }
+    .msg.ok { display: block; background: #dcfce7; color: #166534; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Connect to Rohlik</h1>
+    <p class="subtitle">Enter your Rohlik.cz credentials. They will be stored encrypted on this server to authenticate with Rohlik on your behalf.</p>
+    <div id="msg" class="msg"></div>
+    <form id="form">
+      <input type="hidden" name="client_id" value="{{CLIENT_ID}}">
+      <input type="hidden" name="redirect_uri" value="{{REDIRECT_URI}}">
+      <input type="hidden" name="state" value="{{STATE}}">
+      <input type="hidden" name="code_challenge" value="{{CODE_CHALLENGE}}">
+      <input type="hidden" name="code_challenge_method" value="{{CODE_CHALLENGE_METHOD}}">
+      <input type="hidden" name="csrf_token" value="{{CSRF_TOKEN}}">
+      <label for="rohlik_email">Rohlik Email</label>
+      <input type="email" id="rohlik_email" name="rohlik_email" required autocomplete="email" placeholder="you@example.com">
+      <label for="rohlik_password">Rohlik Password</label>
+      <input type="password" id="rohlik_password" name="rohlik_password" required autocomplete="current-password" placeholder="Your Rohlik password">
+      <button type="submit" id="btn">Sign In &amp; Connect</button>
+    </form>
+    <p class="info">Your credentials are encrypted and only used to access <a href="https://www.rohlik.cz/stranka/mcp-server">Rohlik MCP</a> on your behalf.</p>
+  </div>
+  <script>
+    document.getElementById('form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var btn = document.getElementById('btn');
+      var msg = document.getElementById('msg');
+      btn.disabled = true;
+      btn.textContent = 'Signing in...';
+      msg.className = 'msg';
+
+      try {
+        var res = await fetch('/oauth/authorize', {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' },
+          body: new URLSearchParams(new FormData(this))
+        });
+        var data = await res.json();
+        if (data.redirect_url) {
+          msg.textContent = 'Redirecting...';
+          msg.className = 'msg ok';
+          window.location.href = data.redirect_url;
+          return;
+        }
+        msg.textContent = data.error || 'Unknown error';
+        msg.className = 'msg err';
+      } catch (err) {
+        msg.textContent = 'Connection error. Please try again.';
+        msg.className = 'msg err';
+      }
+      btn.disabled = false;
+      btn.textContent = 'Sign In & Connect';
+    });
+  </script>
+</body>
+</html>
