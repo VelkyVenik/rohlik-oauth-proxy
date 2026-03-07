@@ -58,6 +58,10 @@ switch (command) {
     await list();
     break;
   case "delete":
+    if (!process.argv[3]) {
+      console.error("Missing ID. Usage: bun run cli delete <id>");
+      process.exit(1);
+    }
     await remove(process.argv[3]);
     break;
   default:

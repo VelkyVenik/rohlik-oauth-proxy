@@ -162,15 +162,13 @@ export async function listUsers(): Promise<
   const rows = db
     .query("SELECT id, rohlik_email_enc, created_at FROM users ORDER BY id")
     .all() as { id: number; rohlik_email_enc: string; created_at: string }[];
-  const results = [];
-  for (const row of rows) {
-    results.push({
+  return Promise.all(
+    rows.map(async (row) => ({
       id: row.id,
       rohlikEmail: await decrypt(row.rohlik_email_enc),
       createdAt: row.created_at,
-    });
-  }
-  return results;
+    }))
+  );
 }
 
 // --- OAuth ---
